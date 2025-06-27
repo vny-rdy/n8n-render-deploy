@@ -1,0 +1,161 @@
+{
+  "createdAt": "2025-06-26T08:22:22.655Z",
+  "updatedAt": "2025-06-27T05:01:19.000Z",
+  "id": "yp9obTg2XDCo3E7y",
+  "name": "My workflow",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp-webhook",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b819c8e8-233e-4c78-aeee-c7ef3dc8f901",
+      "name": "Webhook",
+      "webhookId": "2649760c-e8cb-436a-9158-7292659adc39"
+    },
+    {
+      "parameters": {
+        "jsCode": "// grab the message body, sender, timestamp, and (optional) profile name\nconst body    = ($json[\"Body\"] || \"\").toLowerCase();\nconst from    = $json[\"From\"]      || \"\";\nconst profile = $json[\"ProfileName\"] || \"\";\nconst ts      = $json[\"Timestamp\"] || new Date().toISOString();\n\n// only proceed if they said “interested”\nif (!body.includes(\"interested\")) {\n  return [];  // stops here for any other messages\n}\n\n// clean up “whatsapp:” prefix\nconst phone = from.replace(/^whatsapp:/, \"\");\n\nreturn [{\n  json: {\n    phone,\n    date: ts,\n    name: profile   // will be empty string if none set\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "6ea78035-7e86-44a8-b3c0-92ccdb7160cb",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1r7F24NZEZLpmWE78MYvmmbuWIswWpFB3utz1hWcb92A",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1402999618,
+          "mode": "list",
+          "cachedResultName": "Fb/Insta/LinkedIn/Whatsapp Leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1r7F24NZEZLpmWE78MYvmmbuWIswWpFB3utz1hWcb92A/edit#gid=1402999618"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Phone Number": "={{$json[\"Phone\"]}}",
+            "Name": "={{$json[\"Name\"]}}",
+            "Date": "={{$json[\"Date\"]}}",
+            "row_number": "={{$json[\"row_number\"]}}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone Number",
+              "displayName": "Phone Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        440,
+        0
+      ],
+      "id": "55d00f9e-f334-4fb9-a144-4896e3d960aa",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleApi": {
+          "id": "1HJtafvpuk205hYi",
+          "name": "Google Service Account account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "1f7d838b-0e8c-449b-80d8-1ac5a3ae4951",
+  "triggerCount": 0,
+  "tags": []
+}
